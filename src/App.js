@@ -14,7 +14,7 @@ export default function Board() {
 
   function handleClick(i) {
     //if you're taken (ie !NULL), don't get took
-    if (squares[i]) return;
+    if (squares[i] || detWinner(squares)) return;
 
     const nextSquares = squares.slice();
 
@@ -29,8 +29,18 @@ export default function Board() {
     setXIsNext(!xIsNext);
   }
 
+  const winner = detWinner(squares);
+  let status;
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    // status = "Next player: " + (xIsNext ? "X" : "O");
+    status = (xIsNext ? "X" : "O") + "'s turn";
+  }
+
   return (
     <>
+      <div className="status">{status}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -48,4 +58,25 @@ export default function Board() {
       </div>
     </>
   );
+}
+
+function detWinner(squares) {
+  const checks = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8], //acrosses
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8], //downz
+    [0, 4, 8],
+    [2, 4, 6], //goofy ones
+  ];
+
+  for (let i = 0; i < checks.length; i++) {
+    const [a, b, c] = checks[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
 }
